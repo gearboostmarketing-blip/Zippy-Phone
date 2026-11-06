@@ -178,15 +178,11 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
     <div class="backrow"><button class="iconbtn" data-back id="settings-back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2 id="settings-title">Settings</h2></div>
     <p class="hint" id="setup-intro"></p>
     <div id="s-cloud" class="card hidden"></div>
-    <label class="field" id="s-name-row"><span>Your name (printed on your receipts)</span><input id="s-name" type="text" autocomplete="name"></label>
+    <div id="s-prefs">
     <label class="field"><span>Usual currency</span><select id="s-cur"><option>IQD</option><option>USD</option></select></label>
     <label class="field"><span>Usual project</span><input id="s-project" type="text"></label>
-    <details id="s-conn" class="legacy-only"><summary class="hint" style="margin-bottom:12px">Connection to the office sheet</summary>
-      <label class="field"><span>Sheet link</span><input id="s-url" type="url" placeholder="https://script.google.com/…/exec"></label>
-      <label class="field"><span>Access code</span><input id="s-code" type="text" autocapitalize="characters"></label>
-      <button class="secondary" id="s-test" style="width:100%">Test connection</button>
-      <p class="hint" id="s-status"></p>
-    </details>
+    </div>
+    <div class="card hidden" id="s-welcome"><b>Open your invite link</b><p class="hint" style="margin:6px 0 0">Ask the office for your personal Zip Receipt invite link and open it on this phone. It signs you in straight away.</p></div>
     <p class="hint" style="margin-top:22px">Expenses are saved on this phone first, so you can log them without signal. They’re sent to the office automatically when you’re online.</p>
     <p class="hint">Zip Receipt v2.0</p>
   </section>
@@ -208,12 +204,13 @@ function toast(m,ms=2600){ $$(".toast").forEach(t=>t.remove()); const t=document
 const SKEY="zr-phone-settings";
 let S=Object.assign({url:"",code:"",name:"",cur:"IQD",project:"",recent:{business:[],category:[],project:[]}}, JSON.parse(localStorage.getItem(SKEY)||"{}"));
 const saveS=()=>localStorage.setItem(SKEY,JSON.stringify(S));
+delete S.url; delete S.code;
 
 
 /* ---------- HOH cloud ---------- */
 const CLOUD=()=>!!(S.cloud&&S.cloud.url);
-const configured=()=>CLOUD()?!!(S.cloud.sess&&S.cloud.me):(S.url&&S.code&&S.name);
-const canCount=()=>!CLOUD()||["admin","bookkeeper"].includes(S.cloud.me?.role);
+const configured=()=>!!(S.cloud&&S.cloud.sess&&S.cloud.me);
+const canCount=()=>configured()&&["admin","bookkeeper"].includes(S.cloud.me.role);
 function friendly(m){ m=String(m||"");
   if(/Invalid login credentials/i.test(m)) return "Wrong email or password.";
   if(/already registered|user_already_exists/i.test(m)) return "That email already has a login. Tick “I already have a login”.";
@@ -345,7 +342,7 @@ function renderBar(){
   else if(view==="count") bar.innerHTML=editing&&editing.status==="synced"?`<button class="primary" data-back>Done</button>`:`<button class="secondary" data-back>Cancel</button><button class="primary" id="b-ksave">Save count</button>`;
   else if(view==="form") bar.innerHTML=editing&&editing.status==="synced"?`<button class="primary" data-back>Done</button>`:`<button class="secondary" data-back>Cancel</button><button class="primary" id="b-save">Save</button>`;
   else if(view==="join") bar.innerHTML=`<button class="primary" id="b-join">Join</button>`;
-  else bar.innerHTML=`<button class="primary" id="b-ssave">${configured()?"Save":"Start"}</button>`;
+  else bar.innerHTML=configured()?`<button class="primary" id="b-ssave">Save</button>`:"";
 }
 
 async function renderHome(){
@@ -368,6 +365,7 @@ async function renderHome(){
 function updateSync(list){
   const n=list.filter(e=>e.status!=="synced").length, b=$("#sync-btn");
   b.classList.toggle("pending",n>0&&!syncError); b.classList.toggle("err",!!syncError);
+  if(!configured()){ b.classList.add("pending"); $("#sync-text").textContent="Not signed in"; return; }
   $("#sync-text").textContent=syncing?"Sending…":syncError?"Not sent":n?`${n} waiting`:"All sent";
 }
 
@@ -419,7 +417,7 @@ function openForm(e){
   setCur(e?.currency||S.cur||"IQD");
   $("#f-desc").value=e?.description||""; $("#f-business").value=e?.business||""; $("#f-category").value=e?.category||"";
   $("#f-project").value=e?e.project||"":S.project||""; $("#f-date").value=e?.date||today(); $("#f-note").value=e?.note||"";
-  $("#f-noreceipt").checked=!!e?.noShopReceipt; $("#f-reimb").checked=e?!!e.reimbursable:CLOUD(); setPhoto(e?.photo||e?.thumb||null); noReceiptUI();
+  $("#f-noreceipt").checked=!!e?.noShopReceipt; $("#f-reimb").checked=e?!!e.reimbursable:true; setPhoto(e?.photo||e?.thumb||null); noReceiptUI();
   ["business","category","project"].forEach(chips);
   show("form"); if(!e) setTimeout(()=>$("#f-amount").focus(),150);
 }
@@ -442,51 +440,27 @@ let syncing=false, syncError="";
 async function syncAll(){
   if(syncing||!configured()) return; if(!navigator.onLine){ renderHome(); return; }
   syncing=true; syncError=""; renderHome();
-  if(CLOUD()){ try{ await syncCloud(); }catch(err){ syncError=friendly(err.message)||"Couldn’t send"; } finally{ syncing=false; renderHome(); } return; }
-  try{
-    const pending=(await allEntries()).filter(e=>e.status!=="synced").sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
-    for(const e of pending){
-      const entry=e.kind==="count"
-        ? {id:e.id,kind:"count",date:e.date,who:e.who||S.name,countIQD:e.countIQD,countUSD:e.countUSD,note:e.note}
-        : {id:e.id,date:e.date,who:e.who||S.name,amount:e.amount,currency:e.currency,description:e.description,business:e.business,
-           category:e.category,project:e.project,noShopReceipt:e.noShopReceipt,reimbursable:!!e.reimbursable,note:e.note};
-      const r=await fetch(S.url,{method:"POST",body:JSON.stringify({action:"add",code:S.code,entry,photo:e.photo?e.photo.split(",")[1]:null})});
-      const d=JSON.parse(await r.text());
-      if(!d.ok) throw new Error(d.error||"The office sheet said no.");
-      e.status="synced"; e.photo=null; e.photoUrl=d.photoUrl||""; await putEntry(e);
-    }
-    // keep the phone tidy: forget sent expenses older than 60 days
-    const cutoff=new Date(Date.now()-60*864e5).toISOString().slice(0,10);
-    for(const e of await allEntries()) if(e.status==="synced"&&e.date<cutoff) await delEntry(e.id);
-  }catch(err){ syncError=err.message||"Couldn’t send"; if(/access code/i.test(syncError)) toast("The access code is wrong. Ask the office for a new setup link.",5000); }
+  try{ await syncCloud(); }catch(err){ syncError=friendly(err.message)||"Couldn’t send"; }
   finally{ syncing=false; renderHome(); }
 }
 
 /* ---------- settings ---------- */
 function renderCloudSettings(){
-  const box=$("#s-cloud"), on=CLOUD()&&S.cloud.me; box.classList.toggle("hidden",!on); $$(".legacy-only").forEach(x=>x.classList.toggle("hidden",!!CLOUD()));
-  $("#s-name-row").classList.toggle("hidden",!!on);
+  const box=$("#s-cloud"), on=configured(); box.classList.toggle("hidden",!on);
+  $("#s-prefs").classList.toggle("hidden",!on); $("#s-welcome").classList.toggle("hidden",!!on);
   if(!on) return; const c=S.cloud;
   box.innerHTML=`<b>${esc(c.org?.name||"")}</b><div class="hint" style="margin:4px 0 10px">${esc(c.me.name)} · ${esc(c.me.role)}</div>
     ${c.locations.length>1?`<label class="field"><span>Location</span><select id="s-loc">${c.locations.map(l=>`<option value="${l.id}"${l.id===c.locId?" selected":""}>${esc(l.name)}</option>`).join("")}</select></label>`:`<div class="hint" style="margin-bottom:10px">Location: <b>${esc(locNameP())}</b></div>`}
     <button class="secondary" id="s-signout" style="width:100%">Sign out of this phone</button>`;
 }
 function openSettings(first){
-  $("#settings-title").textContent=first?"Welcome":"Settings";
-  $("#settings-back").classList.toggle("hidden",!!first);
-  $("#setup-intro").textContent=first?(S.url?"You’re connected to the office. Type your name to start.":"Open the setup link the office sent you, or fill in the connection below."):"";
-  $("#s-name").value=S.name; $("#s-cur").value=S.cur||"IQD"; $("#s-project").value=S.project||""; $("#s-url").value=S.url; $("#s-code").value=S.code;
-  $("#s-conn").open=first&&!S.url; $("#s-status").textContent="";
-  renderCloudSettings();
-  if(first&&!CLOUD()) $("#setup-intro").textContent="Open the invite link the office sent you. (Older setup: fill in the connection below.)";
-  show("settings"); if(first&&S.url&&!CLOUD()) setTimeout(()=>$("#s-name").focus(),150);
+  $("#settings-title").textContent=configured()?"Settings":"Welcome";
+  $("#settings-back").classList.toggle("hidden",!configured());
+  $("#setup-intro").textContent="";
+  $("#s-cur").value=S.cur||"IQD"; $("#s-project").value=S.project||"";
+  renderCloudSettings(); show("settings");
 }
-function readSettings(){ if(!(CLOUD()&&S.cloud.me)) S.name=$("#s-name").value.trim(); else { const l=$("#s-loc"); if(l) S.cloud.locId=l.value; } if($("#s-cur").value!==S.cur) S.curSet=true; S.cur=$("#s-cur").value; S.project=$("#s-project").value.trim(); S.url=$("#s-url").value.trim(); S.code=$("#s-code").value.trim().toUpperCase(); }
-async function testConn(){
-  readSettings(); const st=$("#s-status"); st.textContent="Checking…";
-  try{ const r=await fetch(S.url+(S.url.includes("?")?"&":"?")+new URLSearchParams({action:"ping",code:S.code})); const d=JSON.parse(await r.text());
-    st.textContent=d.ok?"Connected ✓":(d.error||"Not connected."); }catch(e){ st.textContent="Couldn’t reach the sheet. Check the link and your internet."; }
-}
+function readSettings(){ const l=$("#s-loc"); if(l&&configured()) S.cloud.locId=l.value; if($("#s-cur").value!==S.cur) S.curSet=true; S.cur=$("#s-cur").value; S.project=$("#s-project").value.trim(); }
 
 /* ---------- setup link: #setup=… ---------- */
 function readJoinLink(){
@@ -495,10 +469,9 @@ function readJoinLink(){
   try{ return JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,"+").replace(/_/g,"/"))))); }catch(e){ toast("That invite link didn’t work. Ask the office to send it again."); return null; }
 }
 function readSetupLink(){
-  const m=location.hash.match(/setup=([A-Za-z0-9+/_-]+)/); if(!m) return false;
-  try{ const d=JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,"+").replace(/_/g,"/"))))); if(d.u) S.url=d.u; if(d.c) S.code=String(d.c).toUpperCase();
-    if(d.p&&!S.project) S.project=d.p; if(d.cur) S.cur=d.cur; saveS(); toast("Connected to the office sheet ✓"); }catch(e){ toast("That setup link didn’t work. Ask the office to send it again."); }
-  history.replaceState(null,"",location.pathname+location.search); return true;
+  if(!/setup=/.test(location.hash)) return false;
+  history.replaceState(null,"",location.pathname+location.search);
+  toast("That’s an old setup link. Ask the office for your new invite link.",6000); return true;
 }
 
 /* ---------- events ---------- */
@@ -511,16 +484,14 @@ document.addEventListener("click",async ev=>{
   if(t.closest("#b-ksave")){ saveCount(); return; }
   if(t.closest("#k-delete")){ if(editing&&confirm("Delete this count?")){ await delEntry(editing.id); show("home"); renderHome(); } return; }
   if(t.closest("#b-save")){ saveForm(); return; }
-  if(t.closest("#b-ssave")){ readSettings(); if(!S.name){ toast("Type your name."); $("#s-name").focus(); return; }
-    saveS(); show("home"); renderHome(); if(S.url&&S.code) syncAll(); else toast("Saved. Add the office connection to send expenses."); return; }
+  if(t.closest("#b-ssave")){ readSettings(); saveS(); show("home"); renderHome(); syncAll(); return; }
   const item=t.closest(".item"); if(item){ const e=(await allEntries()).find(x=>x.id===item.dataset.id); if(e) (e.kind==="count"?openCount(e):openForm(e)); return; }
   const chip=t.closest("[data-chip]"); if(chip){ $("#f-"+chip.dataset.chip).value=chip.textContent; return; }
   const cur=t.closest("#f-cur button"); if(cur){ setCur(cur.dataset.c); return; }
   if(t.closest("#sync-btn")){ if(!configured()){ openSettings(true); return; } if(syncError) toast(syncError,4000); syncAll(); return; }
   if(t.closest("#settings-btn")){ openSettings(false); return; }
-  if(t.closest("#s-test")){ testConn(); return; }
   if(t.closest("#b-join")){ finishJoin(); return; }
-  if(t.closest("#s-signout")){ if(confirm("Sign out of this phone? Anything not sent yet stays here until you sign back in.")){ S.cloud=null; saveS(); openSettings(true); } return; }
+  if(t.closest("#s-signout")){ if(confirm("Sign out of this phone? Anything not sent yet stays here until you sign back in.")){ S.cloud=null; saveS(); openSettings(true); renderHome(); } return; }
   if(t.closest("#f-delete")){ if(editing&&confirm("Delete this expense?")){ await delEntry(editing.id); show("home"); renderHome(); } return; }
 });
 $("#f-photo").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; toast("Preparing photo…",1200);
@@ -530,13 +501,13 @@ $("#j-existing").addEventListener("change",e=>{ $("#j-pw-hint").textContent=e.ta
 $("#f-amount").addEventListener("blur",e=>{ const n=num(e.target.value); if(n!=null) e.target.value=n.toLocaleString("en-US",{maximumFractionDigits:2}); });
 window.addEventListener("online",syncAll);
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") syncAll(); });
-window.addEventListener("hashchange",()=>{ const j=readJoinLink(); if(j){ startJoin(j); return; } if(readSetupLink()&&!S.name) openSettings(true); });
+window.addEventListener("hashchange",()=>{ const j=readJoinLink(); if(j){ startJoin(j); return; } readSetupLink(); });
 
 (async()=>{
   await openDB();
   const join=readJoinLink();
   if(join){ show("home"); renderHome(); startJoin(join); }
-  else { readSetupLink(); if(!configured()) openSettings(true); else { show("home"); } renderHome(); syncAll(); }
+  else { readSetupLink(); if(!configured()) openSettings(true); else { show("home"); syncAll(); } renderHome(); }
   setInterval(()=>{ if(document.visibilityState==="visible") syncAll(); },60000);
   if("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 })();
