@@ -1,5 +1,5 @@
 // Keeps Zip Receipt working with no signal. Bump VERSION when the app changes.
-const VERSION = "zr-phone-1.0.0";
+const VERSION = "zr-phone-2.0.0";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

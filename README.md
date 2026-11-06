@@ -1,6 +1,8 @@
-# ⚡ Zip Receipt v1.0 – phone app
+# ⚡ Zip Receipt v2.0 – phone app
 
 A small app for logging HOH expenses on a phone: the amount, what it was for, the shop, and a photo of the receipt. It works without signal and sends everything to the office's Google Sheet when the phone is back online. It works on iPhone and Android.
+
+Tick **Reimbursable** on an expense you paid from your advance or your own money, so the office counts it against your advance instead of the safe.
 
 At the end of each month, it also reminds whoever looks after the safe to do a **safe count**: tap **🔒 Safe count**, enter the dinars and dollars in the safe, and it goes to the office with the expenses.
 
@@ -14,7 +16,15 @@ This repository only holds the app itself. It contains no expenses, names or acc
 4. After a minute, the page shows your address, something like `https://YOUR-NAME.github.io/zip-receipt-phone/`.
 5. Paste that address into Zip Receipt: **Settings → Phones & Google Sheet → Phone app address**.
 
-## Give it to someone
+## v2: joining with an invite link
+
+With HOH cloud set up, people no longer need a setup link with an access code. In Zip Receipt on the computer, use **People → Add person**, then send them the invite link it shows:
+- **Staff** tap the link and they're in. No email or password needed. They see their advance balance at the top, and **Reimbursable** starts ticked on every expense (untick it when they paid with safe cash).
+- **Admins and bookkeepers** tap the link and choose a password. They also get the **Safe count** button.
+
+Then add it to the Home Screen (below).
+
+## Older setup (Google Sheet)
 
 1. In Zip Receipt, click **Settings → Make phone setup link** and send the link privately (WhatsApp is fine). It contains the access code.
 2. On their phone, they open the link and type their name.
