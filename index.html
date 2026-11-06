@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zip Receipt</title>
+<title>ZIPPY</title>
 <meta name="theme-color" content="#24262c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Zip Receipt">
+<meta name="apple-mobile-web-app-title" content="ZIPPY">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -108,7 +108,7 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
 <body>
 <header class="top">
   <div class="bolt"><svg viewBox="0 0 24 24"><path d="M13.2 2 4.5 13.4h6.1L9.8 22l8.7-11.4h-6.1L13.2 2z"/></svg></div>
-  <div class="t"><b>Zip Receipt<span class="ver">v2.0</span></b><small id="who-line"></small></div>
+  <div class="t"><b>ZIPPY<span class="ver">v2.2</span></b><small id="who-line"></small></div>
   <button class="sync" id="sync-btn" aria-label="Sync now"><span class="dot"></span><span id="sync-text">Synced</span></button>
   <button class="iconbtn" id="settings-btn" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
 </header>
@@ -125,7 +125,7 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
   <!-- FORM -->
   <section id="v-form" class="hidden">
     <div class="backrow"><button class="iconbtn" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2 id="form-title">New expense</h2></div>
-    <div class="note hidden" id="form-locked">Already sent to the office. Ask them to change it in Zip Receipt.</div>
+    <div class="note hidden" id="form-locked">Already sent to the office. Ask them to change it in ZIPPY.</div>
     <fieldset id="form-fields" style="border:0;padding:0;margin:0;min-width:0">
       <label class="field"><span>Amount</span>
         <div class="amountrow"><input id="f-amount" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
@@ -156,7 +156,7 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
     <p class="hint" id="join-intro"></p>
     <label class="field"><span>Email</span><input id="j-email" type="email" autocomplete="username"></label>
     <label class="field"><span>Password <span class="hint" id="j-pw-hint">(choose one, at least 6 characters)</span></span><input id="j-pw" type="password" autocomplete="new-password"></label>
-    <label class="check"><input type="checkbox" id="j-existing"> I already have a Zip Receipt login</label>
+    <label class="check"><input type="checkbox" id="j-existing"> I already have a ZIPPY login</label>
   </section>
 
   <!-- SAFE COUNT -->
@@ -182,9 +182,9 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
     <label class="field"><span>Usual currency</span><select id="s-cur"><option>IQD</option><option>USD</option></select></label>
     <label class="field"><span>Usual project</span><input id="s-project" type="text"></label>
     </div>
-    <div class="card hidden" id="s-welcome"><b>Open your invite link</b><p class="hint" style="margin:6px 0 0">Ask the office for your personal Zip Receipt invite link and open it on this phone. It signs you in straight away.</p></div>
+    <div class="card hidden" id="s-welcome"><b>Open your invite link</b><p class="hint" style="margin:6px 0 0">Ask the office for your personal ZIPPY invite link and open it on this phone. It signs you in straight away.</p></div>
     <p class="hint" style="margin-top:22px">Expenses are saved on this phone first, so you can log them without signal. They’re sent to the office automatically when you’re online.</p>
-    <p class="hint">Zip Receipt v2.0</p>
+    <p class="hint">ZIPPY v2.2</p>
   </section>
 </main>
 

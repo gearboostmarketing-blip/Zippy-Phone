@@ -1,4 +1,4 @@
-# ⚡ Zip Receipt v2.0 – phone app
+# ⚡ ZIPPY v2.0 – phone app
 
 A small app for logging HOH expenses on a phone: the amount, what it was for, the shop, and a photo of the receipt. It works without signal and sends everything to HOH cloud when the phone is back online. It works on iPhone and Android.
 
@@ -14,11 +14,11 @@ This repository only holds the app itself. It contains no expenses, names or acc
 2. Upload every file from this folder, then commit.
 3. Go to **Settings → Pages**. Under *Build and deployment*, set **Source: Deploy from a branch**, **Branch: main**, folder **/ (root)**, then **Save**.
 4. After a minute, the page shows your address, something like `https://YOUR-NAME.github.io/zip-receipt-phone/`.
-5. Paste that address into Zip Receipt: **Settings → Phone app address**.
+5. Paste that address into ZIPPY: **Settings → Phone app address**.
 
 ## v2: joining with an invite link
 
-With HOH cloud set up, people no longer need a setup link with an access code. In Zip Receipt on the computer, use **People → Add person**, then send them the invite link it shows:
+With HOH cloud set up, people no longer need a setup link with an access code. In ZIPPY on the computer, use **People → Add person**, then send them the invite link it shows:
 - **Staff** tap the link and they're in. No email or password needed. They see their advance balance at the top, and **Reimbursable** starts ticked on every expense (untick it when they paid with safe cash).
 - **Admins and bookkeepers** tap the link and choose a password. They also get the **Safe count** button.
 
