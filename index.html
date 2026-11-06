@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zip Receipt</title>
+<meta name="theme-color" content="#2d5aa0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Zip Receipt">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#eef1f4; --card:#fff; --ink:#18212b; --muted:#5f6b7a; --line:#dbe0e6; --soft:#f4f6f8;
+  --accent:#2d5aa0; --accent-ink:#fff; --bolt:#ffc629; --ok:#23784a; --ok-bg:#e3f2e9; --warn:#946200; --warn-bg:#fff2cc; --bad:#a23a24;
+  --top:env(safe-area-inset-top,0px); --bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){ :root{
+  --bg:#12171d; --card:#1c232c; --ink:#e8edf2; --muted:#9aa6b4; --line:#2f3946; --soft:#232c37;
+  --accent:#6f9ce0; --accent-ink:#0c1520; --ok:#6fcf97; --ok-bg:#1b3325; --warn:#f2c14e; --warn-bg:#3a3017; --bad:#f08a73; color-scheme:dark; } }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);font:17px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.hidden{display:none !important}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.photo{position:relative}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:calc(var(--top) + 10px) 16px 10px;display:flex;align-items:center;gap:10px}
+.bolt{width:34px;height:34px;border-radius:9px;background:var(--accent);display:grid;place-items:center;flex:none}
+.bolt svg{width:21px;height:21px;fill:var(--bolt)}
+.top .t{flex:1;min-width:0}
+.top b{display:block;font-size:18px;letter-spacing:-.2px}
+.top small{display:block;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{background:none;border:0;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;color:var(--muted)}
+.iconbtn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sync{border:1px solid var(--line);background:var(--soft);border-radius:20px;padding:6px 12px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.sync .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.sync.pending .dot{background:var(--bolt)} .sync.err .dot{background:var(--bad)}
+
+main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.totals{display:flex;gap:18px;flex-wrap:wrap}
+.totals div{display:flex;flex-direction:column}
+.totals span{font-size:13px;color:var(--muted);font-weight:600}
+.totals b{font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.day{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:18px 4px 6px}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;width:100%;text-align:left}
+.item .thumb{width:46px;height:46px;border-radius:8px;background:var(--soft);flex:none;object-fit:cover;display:grid;place-items:center;color:var(--muted);font-size:20px}
+.item .mid{flex:1;min-width:0}
+.item .mid b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.item .mid small{color:var(--muted);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.item .amt{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:10px;padding:1px 7px;margin-top:3px}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.wait{background:var(--warn-bg);color:var(--warn)}
+.empty{text-align:center;color:var(--muted);padding:44px 16px}
+.empty .big{font-size:44px;margin-bottom:6px}
+
+/* bottom bar */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:10px 14px calc(10px + var(--bottom));background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.bar .inner{max-width:620px;margin:0 auto;display:flex;gap:10px}
+.primary{flex:1;background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px;padding:16px;font-size:18px;font-weight:700;box-shadow:0 4px 14px rgba(20,40,80,.25)}
+.secondary{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-weight:700}
+.primary:disabled{opacity:.5}
+
+/* form */
+.field{display:block;margin-bottom:14px}
+.field>span{display:block;font-size:14px;font-weight:600;color:var(--muted);margin:0 0 6px 2px}
+.field input,.field textarea,.field select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:17px}
+.field input:focus,.field textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.amountrow{display:flex;gap:10px}
+.amountrow input{min-width:0;flex:1;width:auto;font-size:30px;font-weight:700;padding:12px 14px;font-variant-numeric:tabular-nums}
+.seg{display:flex;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:3px;flex:none}
+.seg button{border:0;background:none;border-radius:9px;padding:0 14px;font-weight:700;color:var(--muted);min-width:60px}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chips button{border:1px solid var(--line);background:var(--soft);border-radius:16px;padding:5px 12px;font-size:14.5px}
+.photo{border:2px dashed var(--line);border-radius:14px;background:var(--card);padding:16px;text-align:center;display:block;width:100%}
+.photo .cam{font-size:30px}
+.photo img{max-width:100%;max-height:260px;border-radius:10px;display:block;margin:0 auto 8px}
+.check{display:flex;align-items:center;gap:10px;font-weight:600;margin:6px 2px 14px}
+.check input{width:22px;height:22px}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:14.5px;margin-bottom:14px}
+.backrow{display:flex;align-items:center;gap:6px;margin:0 0 10px -6px}
+.backrow h2{margin:0;font-size:21px}
+.hint{color:var(--muted);font-size:14px}
+.danger{color:var(--bad);background:none;border:0;font-weight:700;padding:14px 0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + var(--bottom));background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-size:15px;z-index:30;max-width:90vw;text-align:center}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="bolt"><svg viewBox="0 0 24 24"><path d="M13.2 2 4.5 13.4h6.1L9.8 22l8.7-11.4h-6.1L13.2 2z"/></svg></div>
+  <div class="t"><b>Zip Receipt</b><small id="who-line"></small></div>
+  <button class="sync" id="sync-btn" aria-label="Sync now"><span class="dot"></span><span id="sync-text">Synced</span></button>
+  <button class="iconbtn" id="settings-btn" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section id="v-home">
+    <div class="card"><div class="totals" id="totals"></div></div>
+    <div id="list"></div>
+  </section>
+
+  <!-- FORM -->
+  <section id="v-form" class="hidden">
+    <div class="backrow"><button class="iconbtn" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2 id="form-title">New expense</h2></div>
+    <div class="note hidden" id="form-locked">Already sent to the office. Ask them to change it in Zip Receipt.</div>
+    <fieldset id="form-fields" style="border:0;padding:0;margin:0;min-width:0">
+      <label class="field"><span>Amount</span>
+        <div class="amountrow"><input id="f-amount" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
+          <div class="seg" id="f-cur"><button type="button" data-c="IQD" aria-pressed="true">IQD</button><button type="button" data-c="USD" aria-pressed="false">USD</button></div></div>
+      </label>
+      <label class="field"><span>What was it for?</span><input id="f-desc" type="text" placeholder="e.g. Water cooler repair" autocomplete="off" enterkeyhint="next"></label>
+      <div class="field"><span>Receipt photo</span>
+        <label class="photo" id="photo-box"><input id="f-photo" type="file" accept="image/*" class="vh">
+          <div id="photo-empty"><div class="cam">📷</div><b>Take or choose a photo</b><div class="hint">Of the shop’s receipt or invoice</div></div>
+          <div id="photo-full" class="hidden"><img id="photo-img" alt="Receipt photo"><span class="hint">Tap to change</span></div>
+        </label>
+      </div>
+      <label class="check"><input type="checkbox" id="f-noreceipt"> No receipt from the shop</label>
+      <div class="note hidden" id="noreceipt-note">That’s fine. The office will make an official HOH receipt for it.</div>
+      <label class="field"><span>Shop or business</span><input id="f-business" type="text" placeholder="Where you paid" autocomplete="off"><div class="chips" id="c-business"></div></label>
+      <label class="field"><span>Category</span><input id="f-category" type="text" placeholder="e.g. Repairs, Food, Fuel" autocomplete="off"><div class="chips" id="c-category"></div></label>
+      <label class="field"><span>Project</span><input id="f-project" type="text" autocomplete="off"><div class="chips" id="c-project"></div></label>
+      <label class="field"><span>Date</span><input id="f-date" type="date"></label>
+      <label class="field"><span>Note (optional)</span><textarea id="f-note" rows="2"></textarea></label>
+    </fieldset>
+    <button class="danger hidden" id="f-delete">Delete this expense</button>
+  </section>
+
+  <!-- SETTINGS / SETUP -->
+  <section id="v-settings" class="hidden">
+    <div class="backrow"><button class="iconbtn" data-back id="settings-back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2 id="settings-title">Settings</h2></div>
+    <p class="hint" id="setup-intro"></p>
+    <label class="field"><span>Your name (printed on your receipts)</span><input id="s-name" type="text" autocomplete="name"></label>
+    <label class="field"><span>Usual currency</span><select id="s-cur"><option>IQD</option><option>USD</option></select></label>
+    <label class="field"><span>Usual project</span><input id="s-project" type="text"></label>
+    <details id="s-conn"><summary class="hint" style="margin-bottom:12px">Connection to the office sheet</summary>
+      <label class="field"><span>Sheet link</span><input id="s-url" type="url" placeholder="https://script.google.com/…/exec"></label>
+      <label class="field"><span>Access code</span><input id="s-code" type="text" autocapitalize="characters"></label>
+      <button class="secondary" id="s-test" style="width:100%">Test connection</button>
+      <p class="hint" id="s-status"></p>
+    </details>
+    <p class="hint" style="margin-top:22px">Expenses are saved on this phone first, so you can log them without signal. They’re sent to the office automatically when you’re online.</p>
+  </section>
+</main>
+
+<div class="bar"><div class="inner" id="bar"></div></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const today=()=>{ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const num=v=>{ const n=parseFloat(String(v??"").replace(/[,\s]/g,"")); return isFinite(n)?n:null; };
+const fmt=(n,c)=>{ if(n==null) return ""; const f=c==="USD"&&n%1?2:0; return (c==="USD"?"$":"")+Number(n).toLocaleString("en-US",{minimumFractionDigits:f,maximumFractionDigits:c==="USD"?2:0})+(c==="IQD"?" IQD":""); };
+const uuid=()=>crypto.randomUUID?crypto.randomUUID():"x"+Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+function toast(m,ms=2600){ $$(".toast").forEach(t=>t.remove()); const t=document.createElement("div"); t.className="toast"; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),ms); }
+
+/* ---------- settings (localStorage) ---------- */
+const SKEY="zr-phone-settings";
+let S=Object.assign({url:"",code:"",name:"",cur:"IQD",project:"",recent:{business:[],category:[],project:[]}}, JSON.parse(localStorage.getItem(SKEY)||"{}"));
+const saveS=()=>localStorage.setItem(SKEY,JSON.stringify(S));
+const configured=()=>S.url&&S.code&&S.name;
+
+/* ---------- entries (IndexedDB, holds photos) ---------- */
+let db;
+function openDB(){ return new Promise((res,rej)=>{ const r=indexedDB.open("zip-receipt-phone",1);
+  r.onupgradeneeded=()=>r.result.createObjectStore("entries",{keyPath:"id"}); r.onsuccess=()=>{ db=r.result; res(); }; r.onerror=()=>rej(r.error); }); }
+function tx(mode,fn){ return new Promise((res,rej)=>{ const t=db.transaction("entries",mode); const st=t.objectStore("entries"); const out=fn(st); t.oncomplete=()=>res(out&&out.result!==undefined?out.result:out); t.onerror=()=>rej(t.error); }); }
+const allEntries=()=>tx("readonly",st=>st.getAll());
+const putEntry=e=>tx("readwrite",st=>{ st.put(e); });
+const delEntry=id=>tx("readwrite",st=>{ st.delete(id); });
+
+/* ---------- photos ---------- */
+async function shrink(file,max,q){
+  const img=new Image(); img.src=URL.createObjectURL(file); await img.decode();
+  const s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+  const c=document.createElement("canvas"); c.width=Math.round(img.naturalWidth*s); c.height=Math.round(img.naturalHeight*s);
+  c.getContext("2d").drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(img.src);
+  return c.toDataURL("image/jpeg",q);
+}
+
+/* ---------- views ---------- */
+let view="home", editing=null, draftPhoto=null, draftThumb=null;
+function show(v){ view=v; ["home","form","settings"].forEach(k=>$("#v-"+k).classList.toggle("hidden",k!==v)); renderBar(); window.scrollTo(0,0); }
+function renderBar(){
+  const bar=$("#bar");
+  if(view==="home") bar.innerHTML=`<button class="primary" id="b-new">＋ New expense</button>`;
+  else if(view==="form") bar.innerHTML=editing&&editing.status==="synced"?`<button class="primary" data-back>Done</button>`:`<button class="secondary" data-back>Cancel</button><button class="primary" id="b-save">Save</button>`;
+  else bar.innerHTML=`<button class="primary" id="b-ssave">${configured()?"Save":"Start"}</button>`;
+}
+
+async function renderHome(){
+  $("#who-line").textContent=S.name?`Logging as ${S.name}`:"Not set up";
+  const list=(await allEntries()).sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt));
+  const m=today().slice(0,7), tot={IQD:0,USD:0}; list.filter(e=>e.date.startsWith(m)).forEach(e=>tot[e.currency]+=e.amount);
+  $("#totals").innerHTML=`<div><span>This month · IQD</span><b>${tot.IQD.toLocaleString("en-US")}</b></div><div><span>This month · USD</span><b>$${tot.USD.toLocaleString("en-US",{maximumFractionDigits:2})}</b></div>`;
+  if(!list.length){ $("#list").innerHTML=`<div class="empty"><div class="big">🧾</div><b>No expenses yet</b><div>Tap “New expense” after you pay for something.</div></div>`; updateSync(list); return; }
+  let h="", day="";
+  list.forEach(e=>{ if(e.date!==day){ day=e.date; h+=`<div class="day">${new Date(day+"T00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}</div>`; }
+    h+=`<button class="item" data-id="${e.id}">${e.thumb?`<img class="thumb" src="${e.thumb}" alt="">`:`<span class="thumb">${e.noShopReceipt?"✍️":"🧾"}</span>`}
+      <span class="mid"><b>${esc(e.description)}</b><small>${esc([e.business,e.category].filter(Boolean).join(" · ")||e.project||"")}</small></span>
+      <span class="amt">${fmt(e.amount,e.currency)}<br>${e.status==="synced"?`<span class="pill ok">Sent</span>`:`<span class="pill wait">Waiting</span>`}</span></button>`; });
+  $("#list").innerHTML=h; updateSync(list);
+}
+function updateSync(list){
+  const n=list.filter(e=>e.status!=="synced").length, b=$("#sync-btn");
+  b.classList.toggle("pending",n>0&&!syncError); b.classList.toggle("err",!!syncError);
+  $("#sync-text").textContent=syncing?"Sending…":syncError?"Not sent":n?`${n} waiting`:"All sent";
+}
+
+function chips(kind){ const vals=(S.recent[kind]||[]).slice(0,6);
+  $("#c-"+kind).innerHTML=vals.map(v=>`<button type="button" data-chip="${kind}">${esc(v)}</button>`).join(""); }
+function remember(kind,v){ if(!v) return; const r=(S.recent[kind]||[]).filter(x=>x.toLowerCase()!==v.toLowerCase()); r.unshift(v); S.recent[kind]=r.slice(0,10); }
+function setCur(c){ $$("#f-cur button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.c===c)); }
+const getCur=()=>$('#f-cur button[aria-pressed="true"]').dataset.c;
+function setPhoto(src){ $("#photo-empty").classList.toggle("hidden",!!src); $("#photo-full").classList.toggle("hidden",!src); if(src) $("#photo-img").src=src; }
+function noReceiptUI(){ const on=$("#f-noreceipt").checked; $("#photo-box").parentElement.classList.toggle("hidden",on); $("#noreceipt-note").classList.toggle("hidden",!on); }
+
+function openForm(e){
+  editing=e||null; draftPhoto=e?.photo||null; draftThumb=e?.thumb||null;
+  const locked=e&&e.status==="synced";
+  $("#form-title").textContent=e?(locked?"Expense":"Edit expense"):"New expense";
+  $("#form-locked").classList.toggle("hidden",!locked); $("#form-fields").disabled=!!locked;
+  $("#f-delete").classList.toggle("hidden",!e||locked);
+  $("#f-amount").value=e?Number(e.amount).toLocaleString("en-US",{maximumFractionDigits:2}):"";
+  setCur(e?.currency||S.cur||"IQD");
+  $("#f-desc").value=e?.description||""; $("#f-business").value=e?.business||""; $("#f-category").value=e?.category||"";
+  $("#f-project").value=e?e.project||"":S.project||""; $("#f-date").value=e?.date||today(); $("#f-note").value=e?.note||"";
+  $("#f-noreceipt").checked=!!e?.noShopReceipt; setPhoto(e?.photo||e?.thumb||null); noReceiptUI();
+  ["business","category","project"].forEach(chips);
+  show("form"); if(!e) setTimeout(()=>$("#f-amount").focus(),150);
+}
+async function saveForm(){
+  const amount=num($("#f-amount").value), desc=$("#f-desc").value.trim();
+  if(!amount||amount<=0){ toast("Enter the amount."); $("#f-amount").focus(); return; }
+  if(!desc){ toast("Say what it was for."); $("#f-desc").focus(); return; }
+  const noR=$("#f-noreceipt").checked;
+  if(!noR&&!draftPhoto&&!confirm("No receipt photo. Save anyway?")) return;
+  const e=Object.assign(editing||{id:uuid(),createdAt:new Date().toISOString(),status:"waiting"},{
+    amount, currency:getCur(), description:desc, business:$("#f-business").value.trim(), category:$("#f-category").value.trim(),
+    project:$("#f-project").value.trim(), date:$("#f-date").value||today(), note:$("#f-note").value.trim(), who:S.name,
+    noShopReceipt:noR, photo:noR?null:draftPhoto, thumb:noR?null:draftThumb, status:"waiting" });
+  ["business","category","project"].forEach(k=>remember(k,e[k])); saveS();
+  await putEntry(e); toast("Saved ✓"); show("home"); await renderHome(); syncAll();
+}
+
+/* ---------- sync ---------- */
+let syncing=false, syncError="";
+async function syncAll(){
+  if(syncing||!configured()) return; if(!navigator.onLine){ renderHome(); return; }
+  syncing=true; syncError=""; renderHome();
+  try{
+    const pending=(await allEntries()).filter(e=>e.status!=="synced").sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
+    for(const e of pending){
+      const entry={id:e.id,date:e.date,who:e.who||S.name,amount:e.amount,currency:e.currency,description:e.description,business:e.business,
+        category:e.category,project:e.project,noShopReceipt:e.noShopReceipt,note:e.note};
+      const r=await fetch(S.url,{method:"POST",body:JSON.stringify({action:"add",code:S.code,entry,photo:e.photo?e.photo.split(",")[1]:null})});
+      const d=JSON.parse(await r.text());
+      if(!d.ok) throw new Error(d.error||"The office sheet said no.");
+      e.status="synced"; e.photo=null; e.photoUrl=d.photoUrl||""; await putEntry(e);
+    }
+    // keep the phone tidy: forget sent expenses older than 60 days
+    const cutoff=new Date(Date.now()-60*864e5).toISOString().slice(0,10);
+    for(const e of await allEntries()) if(e.status==="synced"&&e.date<cutoff) await delEntry(e.id);
+  }catch(err){ syncError=err.message||"Couldn’t send"; if(/access code/i.test(syncError)) toast("The access code is wrong. Ask the office for a new setup link.",5000); }
+  finally{ syncing=false; renderHome(); }
+}
+
+/* ---------- settings ---------- */
+function openSettings(first){
+  $("#settings-title").textContent=first?"Welcome":"Settings";
+  $("#settings-back").classList.toggle("hidden",!!first);
+  $("#setup-intro").textContent=first?(S.url?"You’re connected to the office. Type your name to start.":"Open the setup link the office sent you, or fill in the connection below."):"";
+  $("#s-name").value=S.name; $("#s-cur").value=S.cur||"IQD"; $("#s-project").value=S.project||""; $("#s-url").value=S.url; $("#s-code").value=S.code;
+  $("#s-conn").open=first&&!S.url; $("#s-status").textContent="";
+  show("settings"); if(first&&S.url) setTimeout(()=>$("#s-name").focus(),150);
+}
+function readSettings(){ S.name=$("#s-name").value.trim(); S.cur=$("#s-cur").value; S.project=$("#s-project").value.trim(); S.url=$("#s-url").value.trim(); S.code=$("#s-code").value.trim().toUpperCase(); }
+async function testConn(){
+  readSettings(); const st=$("#s-status"); st.textContent="Checking…";
+  try{ const r=await fetch(S.url+(S.url.includes("?")?"&":"?")+new URLSearchParams({action:"ping",code:S.code})); const d=JSON.parse(await r.text());
+    st.textContent=d.ok?"Connected ✓":(d.error||"Not connected."); }catch(e){ st.textContent="Couldn’t reach the sheet. Check the link and your internet."; }
+}
+
+/* ---------- setup link: #setup=… ---------- */
+function readSetupLink(){
+  const m=location.hash.match(/setup=([A-Za-z0-9+/_-]+)/); if(!m) return false;
+  try{ const d=JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,"+").replace(/_/g,"/"))))); if(d.u) S.url=d.u; if(d.c) S.code=String(d.c).toUpperCase();
+    if(d.p&&!S.project) S.project=d.p; if(d.cur) S.cur=d.cur; saveS(); toast("Connected to the office sheet ✓"); }catch(e){ toast("That setup link didn’t work. Ask the office to send it again."); }
+  history.replaceState(null,"",location.pathname+location.search); return true;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",async ev=>{
+  const t=ev.target;
+  if(t.closest("[data-back]")){ show("home"); renderHome(); return; }
+  if(t.closest("#b-new")){ openForm(null); return; }
+  if(t.closest("#b-save")){ saveForm(); return; }
+  if(t.closest("#b-ssave")){ readSettings(); if(!S.name){ toast("Type your name."); $("#s-name").focus(); return; }
+    saveS(); show("home"); renderHome(); if(S.url&&S.code) syncAll(); else toast("Saved. Add the office connection to send expenses."); return; }
+  const item=t.closest(".item"); if(item){ const e=(await allEntries()).find(x=>x.id===item.dataset.id); if(e) openForm(e); return; }
+  const chip=t.closest("[data-chip]"); if(chip){ $("#f-"+chip.dataset.chip).value=chip.textContent; return; }
+  const cur=t.closest("#f-cur button"); if(cur){ setCur(cur.dataset.c); return; }
+  if(t.closest("#sync-btn")){ if(!configured()){ openSettings(true); return; } if(syncError) toast(syncError,4000); syncAll(); return; }
+  if(t.closest("#settings-btn")){ openSettings(false); return; }
+  if(t.closest("#s-test")){ testConn(); return; }
+  if(t.closest("#f-delete")){ if(editing&&confirm("Delete this expense?")){ await delEntry(editing.id); show("home"); renderHome(); } return; }
+});
+$("#f-photo").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; toast("Preparing photo…",1200);
+  try{ draftPhoto=await shrink(f,1600,0.72); draftThumb=await shrink(f,200,0.7); setPhoto(draftPhoto); }catch(err){ toast("Couldn’t read that photo."); } e.target.value=""; });
+$("#f-noreceipt").addEventListener("change",noReceiptUI);
+$("#f-amount").addEventListener("blur",e=>{ const n=num(e.target.value); if(n!=null) e.target.value=n.toLocaleString("en-US",{maximumFractionDigits:2}); });
+window.addEventListener("online",syncAll);
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") syncAll(); });
+window.addEventListener("hashchange",()=>{ if(readSetupLink()&&!S.name) openSettings(true); });
+
+(async()=>{
+  await openDB();
+  readSetupLink();
+  if(!configured()) openSettings(true); else { show("home"); }
+  renderHome(); syncAll();
+  if("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
+})();
+</script>
+</body>
+</html>
