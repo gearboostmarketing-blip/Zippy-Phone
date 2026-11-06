@@ -313,7 +313,7 @@ async function syncCloud(){
       if(e.photo&&!photoPath){ photoPath=`${c.org.id}/${loc}/${me.id}/${e.id}.jpg`; const blob=await (await fetch(e.photo)).blob();
         await sb("POST","/storage/v1/object/receipts/"+photoPath,blob,{headers:{"Content-Type":"image/jpeg","x-upsert":"true"}}); e.photoPath=photoPath; await putEntry(e); }
       data={id:e.id,key:"phone:"+e.id,source:"Phone",date:e.date,time:(e.createdAt||"").slice(11,16),who:me.name,text:[e.description,e.business,e.note].filter(Boolean).join(" · "),
-        desc:e.description,amount:e.amount,currency:e.currency,type:"expense",flags:[],receipt:true,order:0,reimb:!!e.reimbursable,personId:me.id,noShopReceipt:!!e.noShopReceipt,photoPath,
+        desc:e.description,amount:e.amount,currency:e.currency,type:"expense",flags:[],receipt:!photoPath,order:0,reimb:!!e.reimbursable,personId:me.id,noShopReceipt:!!e.noShopReceipt,photoPath,
         rc:{business:e.business||"",category:e.category||"",project:e.project||"",date:e.date,payer:me.name,verifier:"",items:[{d:e.description,q:"",p:"",t:e.amount}],reviewed:false,note:e.note||""}};
     }
     await sb("POST","/rest/v1/records?on_conflict=id",[{id:e.id,org_id:c.org.id,location_id:loc,kind,person_id:person,data,deleted:false}],{prefer:"resolution=merge-duplicates,return=minimal"});
