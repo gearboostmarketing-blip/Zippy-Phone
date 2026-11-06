@@ -1,6 +1,8 @@
-# ⚡ Zip Receipt – phone app
+# ⚡ Zip Receipt v1.0 – phone app
 
 A small app for logging HOH expenses on a phone: the amount, what it was for, the shop, and a photo of the receipt. It works without signal and sends everything to the office's Google Sheet when the phone is back online. It works on iPhone and Android.
+
+At the end of each month, it also reminds whoever looks after the safe to do a **safe count**: tap **🔒 Safe count**, enter the dinars and dollars in the safe, and it goes to the office with the expenses.
 
 This repository only holds the app itself. It contains no expenses, names or access codes; those stay on each phone and in the Google Sheet. That's why it's safe for it to be public, which free GitHub Pages hosting requires.
 

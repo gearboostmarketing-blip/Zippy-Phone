@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Zip Receipt</title>
-<meta name="theme-color" content="#2d5aa0">
+<meta name="theme-color" content="#24262c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,14 +14,14 @@
 <link rel="icon" href="icon-192.png">
 <style>
 :root{
-  --bg:#eef1f4; --card:#fff; --ink:#18212b; --muted:#5f6b7a; --line:#dbe0e6; --soft:#f4f6f8;
-  --accent:#2d5aa0; --accent-ink:#fff; --bolt:#ffc629; --ok:#23784a; --ok-bg:#e3f2e9; --warn:#946200; --warn-bg:#fff2cc; --bad:#a23a24;
+  --bg:#f3f3f6; --card:#fff; --ink:#1f2026; --muted:#676a75; --line:#dcdce3; --soft:#f6f6f9;
+  --accent:#7448f0; --accent-ink:#fff; --bolt:#a07cff; --char:#24262c; --char-ink:#f1f1f5; --char-muted:#a3a5b1; --ok:#23784a; --ok-bg:#e3f2e9; --warn:#946200; --warn-bg:#fff2cc; --bad:#a23a24;
   --top:env(safe-area-inset-top,0px); --bottom:env(safe-area-inset-bottom,0px);
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){ :root{
-  --bg:#12171d; --card:#1c232c; --ink:#e8edf2; --muted:#9aa6b4; --line:#2f3946; --soft:#232c37;
-  --accent:#6f9ce0; --accent-ink:#0c1520; --ok:#6fcf97; --ok-bg:#1b3325; --warn:#f2c14e; --warn-bg:#3a3017; --bad:#f08a73; color-scheme:dark; } }
+  --bg:#141519; --card:#1e2025; --ink:#ececf1; --muted:#9b9da9; --line:#30323a; --soft:#25272d;
+  --accent:#a387ff; --accent-ink:#141519; --char:#0f1013; --ok:#6fcf97; --ok-bg:#1b3325; --warn:#f2c14e; --warn-bg:#3a3017; --bad:#f08a73; color-scheme:dark; } }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);font:17px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -31,15 +31,16 @@ button{cursor:pointer}
 .photo{position:relative}
 
 /* top bar */
-.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:calc(var(--top) + 10px) 16px 10px;display:flex;align-items:center;gap:10px}
-.bolt{width:34px;height:34px;border-radius:9px;background:var(--accent);display:grid;place-items:center;flex:none}
+.top{position:sticky;top:0;z-index:10;background:var(--char);color:var(--char-ink);border-bottom:1px solid #000;padding:calc(var(--top) + 10px) 16px 10px;display:flex;align-items:center;gap:10px}
+.bolt{width:34px;height:34px;border-radius:9px;background:#35373f;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);display:grid;place-items:center;flex:none}
 .bolt svg{width:21px;height:21px;fill:var(--bolt)}
 .top .t{flex:1;min-width:0}
 .top b{display:block;font-size:18px;letter-spacing:-.2px}
-.top small{display:block;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top small{display:block;color:var(--char-muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .iconbtn{background:none;border:0;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;color:var(--muted)}
+.top .iconbtn{color:var(--char-muted)}
 .iconbtn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.sync{border:1px solid var(--line);background:var(--soft);border-radius:20px;padding:6px 12px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.sync{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--char-ink);border-radius:20px;padding:6px 12px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .sync .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
 .sync.pending .dot{background:var(--bolt)} .sync.err .dot{background:var(--bad)}
 
@@ -64,7 +65,7 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
 /* bottom bar */
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:10px 14px calc(10px + var(--bottom));background:linear-gradient(to top,var(--bg) 70%,transparent)}
 .bar .inner{max-width:620px;margin:0 auto;display:flex;gap:10px}
-.primary{flex:1;background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px;padding:16px;font-size:18px;font-weight:700;box-shadow:0 4px 14px rgba(20,40,80,.25)}
+.primary{flex:1;background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px;padding:16px;font-size:18px;font-weight:700;box-shadow:0 4px 14px rgba(70,30,160,.28)}
 .secondary{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-weight:700}
 .primary:disabled{opacity:.5}
 
@@ -90,13 +91,17 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
 .backrow h2{margin:0;font-size:21px}
 .hint{color:var(--muted);font-size:14px}
 .danger{color:var(--bad);background:none;border:0;font-weight:700;padding:14px 0}
+.remind{display:flex;gap:12px;align-items:center;background:color-mix(in srgb,var(--accent) 12%,var(--card));border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:14px;padding:12px 14px;margin-bottom:12px;width:100%;text-align:left}
+.remind .ico{font-size:24px}
+.remind b{display:block}
+.ver{font-size:11px;font-weight:700;color:var(--bolt);margin-left:6px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + var(--bottom));background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-size:15px;z-index:30;max-width:90vw;text-align:center}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="bolt"><svg viewBox="0 0 24 24"><path d="M13.2 2 4.5 13.4h6.1L9.8 22l8.7-11.4h-6.1L13.2 2z"/></svg></div>
-  <div class="t"><b>Zip Receipt</b><small id="who-line"></small></div>
+  <div class="t"><b>Zip Receipt<span class="ver">v1.0</span></b><small id="who-line"></small></div>
   <button class="sync" id="sync-btn" aria-label="Sync now"><span class="dot"></span><span id="sync-text">Synced</span></button>
   <button class="iconbtn" id="settings-btn" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
 </header>
@@ -104,6 +109,7 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
 <main>
   <!-- HOME -->
   <section id="v-home">
+    <div id="remind-slot"></div>
     <div class="card"><div class="totals" id="totals"></div></div>
     <div id="list"></div>
   </section>
@@ -135,6 +141,20 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
     <button class="danger hidden" id="f-delete">Delete this expense</button>
   </section>
 
+  <!-- SAFE COUNT -->
+  <section id="v-count" class="hidden">
+    <div class="backrow"><button class="iconbtn" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2 id="count-title">Safe count</h2></div>
+    <div class="note hidden" id="count-locked">Already sent to the office.</div>
+    <p class="hint" style="margin-top:0">Count all the cash in the safe and enter both currencies. Put 0 if one is empty.</p>
+    <fieldset id="count-fields" style="border:0;padding:0;margin:0;min-width:0">
+      <label class="field"><span>Dinars in the safe (IQD)</span><input id="k-iqd" type="text" inputmode="decimal" placeholder="0" autocomplete="off" style="font-size:26px;font-weight:700"></label>
+      <label class="field"><span>Dollars in the safe (USD)</span><input id="k-usd" type="text" inputmode="decimal" placeholder="0" autocomplete="off" style="font-size:26px;font-weight:700"></label>
+      <label class="field"><span>Date</span><input id="k-date" type="date"></label>
+      <label class="field"><span>Note (optional)</span><input id="k-note" type="text" placeholder="e.g. counted with Moe"></label>
+    </fieldset>
+    <button class="danger hidden" id="k-delete">Delete this count</button>
+  </section>
+
   <!-- SETTINGS / SETUP -->
   <section id="v-settings" class="hidden">
     <div class="backrow"><button class="iconbtn" data-back id="settings-back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><h2 id="settings-title">Settings</h2></div>
@@ -149,6 +169,7 @@ main{padding:14px 14px calc(100px + var(--bottom));max-width:620px;margin:0 auto
       <p class="hint" id="s-status"></p>
     </details>
     <p class="hint" style="margin-top:22px">Expenses are saved on this phone first, so you can log them without signal. They’re sent to the office automatically when you’re online.</p>
+    <p class="hint">Zip Receipt v1.0</p>
   </section>
 </main>
 
@@ -190,10 +211,11 @@ async function shrink(file,max,q){
 
 /* ---------- views ---------- */
 let view="home", editing=null, draftPhoto=null, draftThumb=null;
-function show(v){ view=v; ["home","form","settings"].forEach(k=>$("#v-"+k).classList.toggle("hidden",k!==v)); renderBar(); window.scrollTo(0,0); }
+function show(v){ view=v; ["home","form","count","settings"].forEach(k=>$("#v-"+k).classList.toggle("hidden",k!==v)); renderBar(); window.scrollTo(0,0); }
 function renderBar(){
   const bar=$("#bar");
-  if(view==="home") bar.innerHTML=`<button class="primary" id="b-new">＋ New expense</button>`;
+  if(view==="home") bar.innerHTML=`<button class="secondary" id="b-count">🔒 Safe count</button><button class="primary" id="b-new">＋ New expense</button>`;
+  else if(view==="count") bar.innerHTML=editing&&editing.status==="synced"?`<button class="primary" data-back>Done</button>`:`<button class="secondary" data-back>Cancel</button><button class="primary" id="b-ksave">Save count</button>`;
   else if(view==="form") bar.innerHTML=editing&&editing.status==="synced"?`<button class="primary" data-back>Done</button>`:`<button class="secondary" data-back>Cancel</button><button class="primary" id="b-save">Save</button>`;
   else bar.innerHTML=`<button class="primary" id="b-ssave">${configured()?"Save":"Start"}</button>`;
 }
@@ -201,11 +223,15 @@ function renderBar(){
 async function renderHome(){
   $("#who-line").textContent=S.name?`Logging as ${S.name}`:"Not set up";
   const list=(await allEntries()).sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt));
-  const m=today().slice(0,7), tot={IQD:0,USD:0}; list.filter(e=>e.date.startsWith(m)).forEach(e=>tot[e.currency]+=e.amount);
+  const m=today().slice(0,7), tot={IQD:0,USD:0}; list.filter(e=>e.kind!=="count"&&e.date.startsWith(m)).forEach(e=>tot[e.currency]+=e.amount);
+  renderRemind(list);
   $("#totals").innerHTML=`<div><span>This month · IQD</span><b>${tot.IQD.toLocaleString("en-US")}</b></div><div><span>This month · USD</span><b>$${tot.USD.toLocaleString("en-US",{maximumFractionDigits:2})}</b></div>`;
   if(!list.length){ $("#list").innerHTML=`<div class="empty"><div class="big">🧾</div><b>No expenses yet</b><div>Tap “New expense” after you pay for something.</div></div>`; updateSync(list); return; }
   let h="", day="";
-  list.forEach(e=>{ if(e.date!==day){ day=e.date; h+=`<div class="day">${new Date(day+"T00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}</div>`; }
+  list.forEach(e=>{ if(e.kind==="count"){ if(e.date!==day){ day=e.date; h+=`<div class="day">${new Date(day+"T00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}</div>`; }
+      h+=`<button class="item" data-id="${e.id}"><span class="thumb">🔒</span><span class="mid"><b>Safe count</b><small>${esc(e.note||"Cash in the safe")}</small></span>
+      <span class="amt">${Number(e.countIQD||0).toLocaleString("en-US")} IQD<br>$${Number(e.countUSD||0).toLocaleString("en-US",{maximumFractionDigits:2})} ${e.status==="synced"?`<span class="pill ok">Sent</span>`:`<span class="pill wait">Waiting</span>`}</span></button>`; return; }
+    if(e.date!==day){ day=e.date; h+=`<div class="day">${new Date(day+"T00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}</div>`; }
     h+=`<button class="item" data-id="${e.id}">${e.thumb?`<img class="thumb" src="${e.thumb}" alt="">`:`<span class="thumb">${e.noShopReceipt?"✍️":"🧾"}</span>`}
       <span class="mid"><b>${esc(e.description)}</b><small>${esc([e.business,e.category].filter(Boolean).join(" · ")||e.project||"")}</small></span>
       <span class="amt">${fmt(e.amount,e.currency)}<br>${e.status==="synced"?`<span class="pill ok">Sent</span>`:`<span class="pill wait">Waiting</span>`}</span></button>`; });
@@ -215,6 +241,36 @@ function updateSync(list){
   const n=list.filter(e=>e.status!=="synced").length, b=$("#sync-btn");
   b.classList.toggle("pending",n>0&&!syncError); b.classList.toggle("err",!!syncError);
   $("#sync-text").textContent=syncing?"Sending…":syncError?"Not sent":n?`${n} waiting`:"All sent";
+}
+
+/* safe count reminder: last 3 days of the month, or first 5 days of the next, if no count was logged for that month */
+function countDueMonth(list){
+  const t=today(), d=+t.slice(8,10), m=t.slice(0,7), dim=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();
+  const has=mm=>list.some(e=>e.kind==="count"&&e.date.startsWith(mm));
+  const prev=(()=>{ let [y,mm]=m.split("-").map(Number); mm--; if(!mm){mm=12;y--;} return y+"-"+String(mm).padStart(2,"0"); })();
+  if(d>=dim-2&&!has(m)) return m;
+  if(d<=5&&!has(prev)) return prev;
+  return null;
+}
+function renderRemind(list){
+  const due=countDueMonth(list), name=due?new Date(due+"-15T00:00").toLocaleDateString(undefined,{month:"long"}):"";
+  $("#remind-slot").innerHTML=due?`<button class="remind" id="b-remind" data-month="${due}"><span class="ico">🔒</span><span><b>Time for the ${name} safe count</b><span class="hint">Count the cash in the safe and send it to the office.</span></span></button>`:"";
+}
+function openCount(e,month){
+  editing=e||null; const locked=e&&e.status==="synced";
+  $("#count-title").textContent=e?"Safe count":"New safe count";
+  $("#count-locked").classList.toggle("hidden",!locked); $("#count-fields").disabled=!!locked; $("#k-delete").classList.toggle("hidden",!e||locked);
+  const m=month||today().slice(0,7), dim=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();
+  $("#k-iqd").value=e?Number(e.countIQD||0).toLocaleString("en-US"):""; $("#k-usd").value=e?Number(e.countUSD||0).toLocaleString("en-US",{maximumFractionDigits:2}):"";
+  $("#k-date").value=e?.date||(today().startsWith(m)?today():`${m}-${String(dim).padStart(2,"0")}`); $("#k-note").value=e?.note||"";
+  show("count"); if(!e) setTimeout(()=>$("#k-iqd").focus(),150);
+}
+async function saveCount(){
+  const iqd=num($("#k-iqd").value), usd=num($("#k-usd").value);
+  if(iqd==null&&usd==null){ toast("Enter what’s in the safe (0 if a currency is empty)."); $("#k-iqd").focus(); return; }
+  const e=Object.assign(editing||{id:uuid(),createdAt:new Date().toISOString()},{kind:"count",countIQD:iqd??0,countUSD:usd??0,
+    date:$("#k-date").value||today(),note:$("#k-note").value.trim(),who:S.name,status:"waiting",amount:0,currency:"IQD",description:"Safe count"});
+  await putEntry(e); toast("Safe count saved ✓"); show("home"); await renderHome(); syncAll();
 }
 
 function chips(kind){ const vals=(S.recent[kind]||[]).slice(0,6);
@@ -261,8 +317,10 @@ async function syncAll(){
   try{
     const pending=(await allEntries()).filter(e=>e.status!=="synced").sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
     for(const e of pending){
-      const entry={id:e.id,date:e.date,who:e.who||S.name,amount:e.amount,currency:e.currency,description:e.description,business:e.business,
-        category:e.category,project:e.project,noShopReceipt:e.noShopReceipt,note:e.note};
+      const entry=e.kind==="count"
+        ? {id:e.id,kind:"count",date:e.date,who:e.who||S.name,countIQD:e.countIQD,countUSD:e.countUSD,note:e.note}
+        : {id:e.id,date:e.date,who:e.who||S.name,amount:e.amount,currency:e.currency,description:e.description,business:e.business,
+           category:e.category,project:e.project,noShopReceipt:e.noShopReceipt,note:e.note};
       const r=await fetch(S.url,{method:"POST",body:JSON.stringify({action:"add",code:S.code,entry,photo:e.photo?e.photo.split(",")[1]:null})});
       const d=JSON.parse(await r.text());
       if(!d.ok) throw new Error(d.error||"The office sheet said no.");
@@ -304,10 +362,14 @@ document.addEventListener("click",async ev=>{
   const t=ev.target;
   if(t.closest("[data-back]")){ show("home"); renderHome(); return; }
   if(t.closest("#b-new")){ openForm(null); return; }
+  if(t.closest("#b-count")){ openCount(null); return; }
+  const rm=t.closest("#b-remind"); if(rm){ openCount(null,rm.dataset.month); return; }
+  if(t.closest("#b-ksave")){ saveCount(); return; }
+  if(t.closest("#k-delete")){ if(editing&&confirm("Delete this count?")){ await delEntry(editing.id); show("home"); renderHome(); } return; }
   if(t.closest("#b-save")){ saveForm(); return; }
   if(t.closest("#b-ssave")){ readSettings(); if(!S.name){ toast("Type your name."); $("#s-name").focus(); return; }
     saveS(); show("home"); renderHome(); if(S.url&&S.code) syncAll(); else toast("Saved. Add the office connection to send expenses."); return; }
-  const item=t.closest(".item"); if(item){ const e=(await allEntries()).find(x=>x.id===item.dataset.id); if(e) openForm(e); return; }
+  const item=t.closest(".item"); if(item){ const e=(await allEntries()).find(x=>x.id===item.dataset.id); if(e) (e.kind==="count"?openCount(e):openForm(e)); return; }
   const chip=t.closest("[data-chip]"); if(chip){ $("#f-"+chip.dataset.chip).value=chip.textContent; return; }
   const cur=t.closest("#f-cur button"); if(cur){ setCur(cur.dataset.c); return; }
   if(t.closest("#sync-btn")){ if(!configured()){ openSettings(true); return; } if(syncError) toast(syncError,4000); syncAll(); return; }
